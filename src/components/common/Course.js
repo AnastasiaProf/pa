@@ -36,6 +36,8 @@ const MediaQuery = gql`
         }
         annotations(filterCourseIDs:[$courseID]) {
             annotationID
+            deleted
+            category
             students{
                 userID
                 firstName
@@ -143,8 +145,8 @@ class Course extends Component{
         let array = {};
         console.log(annotations)
         annotations.map((annotation) => {
-            
-            if(annotation.students.length == 0){
+        if(annotation.deleted == false && annotation.category == "mdeia" ){
+            if(annotation.students.length == 0 ){
                 if(!("allclass" in array)){
                    array["allclass"] = [];
                 }
@@ -158,14 +160,14 @@ class Course extends Component{
                      
                  })  
             }
-            
+          } 
         })
         return(array);
     }
     
-    handleClick(){
-        
-     return alert("toto");
+    handleClick(e){
+        e.preventDefault();
+      alert("toto");
     }
     
     render(){
@@ -217,7 +219,7 @@ class Course extends Component{
                         case "allclass":
                         return(
                             <div>
-                            <div>All Class</div>
+                            <div className="name">All Class</div>
                             <Row>
                     <Masonry className={'my-gallery-class'} options={masonryOptions} >
                              {sorted[key].map((annotation) => {
@@ -225,7 +227,7 @@ class Course extends Component{
                                     case "image":
                                        return (
                                             <div>
-                                            <img onClick={this.handleClick().bind(this)} className="img-size media"  key={annotation.annotationID}/>
+                                            <img onClick={this.handleClick.bind(this)} className="img-size media"  key={annotation.annotationID}/>
                                             </div>
                                        
                                         );
@@ -234,7 +236,7 @@ class Course extends Component{
                                     case "video":
                                          return (
                                           <div>
-                                             <ReactPlayer  key={annotation.annotationID}  className="videoannotation media" url={annotation.mediaURL} controls/>
+                                             <ReactPlayer onClick={this.handleClick.bind(this)} key={annotation.annotationID}  className="videoannotation media" url={annotation.mediaURL} controls/>
                                               
                                             </div>
                                             
@@ -256,7 +258,7 @@ class Course extends Component{
                         default : 
                             return(
                                 <div>
-                                <div>{sorted[key][0].students[0].firstName}</div>
+                                <div className="name">{sorted[key][0].students[0].firstName}</div>
                                 <Row>
                                 <Masonry className={'my-gallery-class'} options={masonryOptions} >
                                 {sorted[key].map((annotation) => {
@@ -265,7 +267,7 @@ class Course extends Component{
                                         case "image":
                                            return (
                                                  <div>  
-                                                <img onClick={this.handleClick().bind(this)}  className="img-size media"   src={annotation.mediaURL}/>
+                                                <img onClick={this.handleClick.bind(this)}  className="img-size media"   src={annotation.mediaURL}/>
                                                
                                             </div>
                                                );
@@ -274,7 +276,7 @@ class Course extends Component{
                                         case "video":
                                              return (
                                                 <div> 
-                                                    <ReactPlayer   className="videoannotation media"  url={annotation.mediaURL} controls/>
+                                                    <ReactPlayer  onClick={this.handleClick.bind(this)} className="videoannotation media"  url={annotation.mediaURL} controls/>
                                                  
                                             </div>
                                              );
