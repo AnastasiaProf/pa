@@ -62,7 +62,8 @@ const MediaQuery = gql`
     }`;
 
 var masonryOptions = {
-    columnWidth: 120
+    columnWidth: 120,
+    itemSelector: '.media'
 };
 
 
@@ -164,7 +165,7 @@ class Course extends Component{
     
     handleClick(){
         
-      alert("toto");
+     return alert("toto");
     }
     
     render(){
@@ -223,9 +224,8 @@ class Course extends Component{
                                  switch(annotation.contentType){
                                     case "image":
                                        return (
-                                            <div onClick={this.handleClick().bind(this)}>
-                                            <img className="img-size"  key={annotation.annotationID} src={annotation.mediaURL}/>
-                                            <svg width="24px" height="24px" fill="blue" class="JUQOtc orgUxc" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+                                            <div>
+                                            <img onClick={this.handleClick().bind(this)} className="img-size media"  key={annotation.annotationID}/>
                                             </div>
                                        
                                         );
@@ -233,9 +233,9 @@ class Course extends Component{
 
                                     case "video":
                                          return (
-                                          <div onClick={this.handleClick().bind(this)}>
-                                             <ReactPlayer  key={annotation.annotationID}  className="videoannotation" url={annotation.mediaURL} controls/>
-                                              <svg width="24px" height="24px" fill="blue" class="JUQOtc orgUxc" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+                                          <div>
+                                             <ReactPlayer  key={annotation.annotationID}  className="videoannotation media" url={annotation.mediaURL} controls/>
+                                              
                                             </div>
                                             
                            
@@ -264,18 +264,18 @@ class Course extends Component{
                                      switch(annotation.contentType){
                                         case "image":
                                            return (
-                                                 <div onClick={this.handleClick().bind(this)}>  
-                                                <img className="img-size"   src={annotation.mediaURL}/>
-                                               <svg width="24px" height="24px" fill="blue" class="JUQOtc orgUxc" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+                                                 <div>  
+                                                <img onClick={this.handleClick().bind(this)}  className="img-size media"   src={annotation.mediaURL}/>
+                                               
                                             </div>
                                                );
                                         break;
 
                                         case "video":
                                              return (
-                                                <div onClick={this.handleClick().bind(this)}> 
-                                                    <ReactPlayer className="videoannotation"  url={annotation.mediaURL} controls/>
-                                                 <svg width="24px" height="24px" fill="blue" class="JUQOtc orgUxc" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+                                                <div> 
+                                                    <ReactPlayer   className="videoannotation media"  url={annotation.mediaURL} controls/>
+                                                 
                                             </div>
                                              );
                                         break;

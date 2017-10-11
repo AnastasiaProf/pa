@@ -91,6 +91,11 @@ div.videoannotation{
 
 }
 
+svg {
+    position: absolute;
+    top: -5%;
+}
+
 /* home with courses & schedule */
 
 .imagepreview{
