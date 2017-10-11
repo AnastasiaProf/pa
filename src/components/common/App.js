@@ -6,9 +6,8 @@
 
 import React, { Component } from 'react';
 import '../../App.css';
-import Grid from 'react-bootstrap/lib/Grid';
-import Row from 'react-bootstrap/lib/Row';
-import Col from 'react-bootstrap/lib/Col';
+import {Grid,Row,Col,Navbar,NavItem,Nav} from 'react-bootstrap';
+import currentWeekNumber from 'current-week-number';
 import { Link } from 'react-router-dom';
 import logo from '../../blacklogo.png';
 
@@ -36,15 +35,24 @@ class App extends Component {
                 <Grid>
                     <Row>
                         {localStorage.getItem('token') ?
-                            <Col xs={12} md={12}>
-                                <ul className="header">
-                                    <li> <img src={logo} className="EF-logo" alt="EF logo" /> </li>
-                                    <li><Link to={`/`}>Home</Link></li>
-                                    <li><Link to={`/students`}>Students</Link></li>
-                                    <li><Link to={`/configuration`}>Settings</Link></li>
-                                    <li className="logout"><Link onClick={this.logout} to={`/signin`}>Logout</Link></li>
-                                </ul>
-                            </Col>
+                        <Navbar inverse collapseOnSelect>
+                            <Navbar.Header>
+                              <Navbar.Brand>
+                                <span>EF PA Portal</span>
+                              </Navbar.Brand>
+                              <Navbar.Toggle />
+                            </Navbar.Header>
+                            <Navbar.Collapse>
+                              <Nav>
+                                <NavItem eventKey={1}><Link to={`/`}>Home</Link></NavItem>
+                                <NavItem eventKey={2}><Link to={`/students`}>Students</Link></NavItem>
+                                <NavItem eventKey={2}><Link to={`/configuration`}>Settings</Link></NavItem>
+                              </Nav>
+                              <Nav pullRight>
+                                <NavItem eventKey={1}><Link onClick={this.logout} to={`/signin`}>Logout</Link></NavItem>
+                              </Nav>
+                            </Navbar.Collapse>
+                          </Navbar>
                         : null}
                     </Row>
                 </Grid>

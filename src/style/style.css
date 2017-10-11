@@ -1,8 +1,6 @@
 body {
-  background-color: white;
-  padding: 20px;
+  background-color: rgb(217,83,79);
   margin: 0;
-  background-color: rgb(242, 242, 242);
   width: 100%; 
 }
 
@@ -14,22 +12,21 @@ a h4{
 h1, h2, p, ul, li {
   font-family: Helvetica, Arial, sans-serif;
 }
-ul.header li {
-  display: inline;
-  list-style-type: none;
-  margin: 0;
+
+span.navbar-brand{
+    color: white !important;
+    text-shadow: none;
 }
-ul.header {
-  background-color: white;
-  padding-top:2%;
-  padding-bottom:2%;
-  
+
+.navbar-inverse {
+    background-color: rgb(217,83,79) !important;
+    background-image: none;
+    border: 0px !important;
 }
-ul.header li a {
-  font-weight: bold;
-  text-decoration: none;
-  padding: 20px;
-  display: inline-block;
+
+ul.nav.navbar-nav li a a {
+    color: white;
+    text-shadow: none;
 }
 
 .content {
@@ -78,8 +75,47 @@ ul.header li a {
 .logout{
   float: right;
 }
+/* Class Page */
+
+.img-size{
+    width: 30%;
+}
+
+div.videoannotation{
+    margin: 1% !important;
+
+/*
+    width: 25% !important;
+    height: auto !important;
+*/
+
+}
 
 /* home with courses & schedule */
+
+.imagepreview{
+    width: 25% !important;
+}
+
+.imagepreview img{
+    width: 100%;
+    padding: 3px;
+} 
+
+.mediabox{
+    height: 200px;
+    margin-bottom: 20px !important;
+    border: 0px !important; 
+    border-radius: 0px !important;
+    overflow: hidden;
+    box-shadow: 0px 0px 5px -1px rgba(71,71,71,1);
+}
+
+.annot_nbr{
+    float: right;
+    text-align: center;
+    background-color: 
+}
 
 .tab{
   float: none !important;
@@ -459,10 +495,4 @@ div.ReactTags__suggestions ul li.ReactTags__activeSuggestion {
 
 .student-description{
     border: 1px solid black;
-}
-
-.student-picture{
-    margin-top: 2%;
-    margin-bottom: 2%;
-    width: 50%;
 }

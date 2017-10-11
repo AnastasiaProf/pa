@@ -4,28 +4,67 @@
  * Child : StudentHomeList
  */
 
+//{/*assign StudentHomeList as a child and pass into it the selected Course object & the current teacherID*/}
+//                <StudentHomeList ref={(child) => {
+//                    //Assign this.child to the instance of the component studenthomelist
+//                    if(!(child == null )){
+//                        this.child = child.getWrappedInstance();
+//                    }
+//                } } filterStudValue={this.props.match.params.courseID} teacherID={localStorage.getItem('userID')} handler={this.handler.bind(this)}/>
+
 import React, {Component} from 'react';
 import { graphql ,gql} from 'react-apollo';
 import { Link } from 'react-router-dom';
 import {FormControl, Modal, Grid,Row,Col,Glyphicon,ListGroupItem} from 'react-bootstrap';
 import currentWeekNumber from 'current-week-number';
-
+import Masonry from 'react-masonry-component';
+import ReactPlayer from 'react-player';
 import StudentHomeList from '../student/StudentHomeList';
 
-
-const CourseQuery = gql`    
-    query StudentsQuery($courseID: ID!, $teacherID: ID!) {
-        course(courseID: $courseID){
+const MediaQuery = gql`    
+    query MediaQuery($courseID: ID!) {
+        course(courseID: $courseID) {
+            courseID                                                       
+            courseName
             description
-        }
-        annotations(filterTeacherID: $teacherID){
-            annotationID
+            courseStartDate
+            courseEndDate
+            courseStartWeekCode
+            courseEndWeekCode
             createdAt
+            updatedAt
+        }
+        annotations(filterCourseIDs:[$courseID]) {
+            annotationID
             students{
                 userID
+                firstName
+                lastName
+                photoURL          
             }
+            course{
+                courseID
+                courseName
+                description
+            } 
+            contentType
+            mediaURL
+            thumbnailURL
+            text
+            tags
+            transcript
+            classDate
+            createdAt
+            updatedAt
+            transcribedAt
+            deleted
     }
     }`;
+
+var masonryOptions = {
+    columnWidth: 120
+};
+
 
 class Course extends Component{
     constructor(props) {
@@ -97,14 +136,47 @@ class Course extends Component{
         })
     }
 
-
+    
+    sortAnnot(annotations){
+        
+        let array = {};
+        console.log(annotations)
+        annotations.map((annotation) => {
+            
+            if(annotation.students.length == 0){
+                if(!("allclass" in array)){
+                   array["allclass"] = [];
+                }
+                array["allclass"].push(annotation);
+            }else{
+                 annotation.students.map((student) => {
+                    if(!(student.userID in array)){
+                       array[student.userID] = [];
+                    }
+                    array[student.userID].push(annotation);
+                     
+                 })  
+            }
+            
+        })
+        return(array);
+    }
+    
+    handleClick(){
+        
+      alert("toto");
+    }
+    
     render(){
+        console.log(this);
         let course = "";
         if (this.props.data.loading){
             return <div>Loading...</div>;
         }
         let annotweek = this.generateWeeks();
-
+        
+        let sorted = this.sortAnnot(this.props.data.annotations);
+        console.log(sorted)
         return(
             <div>
                 <Grid>
@@ -136,15 +208,95 @@ class Course extends Component{
                         </Col>
                     </Row>
                 </Grid>
+                                    
+                                    
+                 <Grid>
+                  {Object.keys(sorted).map((key) => {
+                    switch(key){
+                        case "allclass":
+                        return(
+                            <div>
+                            <div>All Class</div>
+                            <Row>
+                    <Masonry className={'my-gallery-class'} options={masonryOptions} >
+                             {sorted[key].map((annotation) => {
+                                 switch(annotation.contentType){
+                                    case "image":
+                                       return (
+                                            <div onClick={this.handleClick().bind(this)}>
+                                            <img className="img-size"  key={annotation.annotationID} src={annotation.mediaURL}/>
+                                            <svg width="24px" height="24px" fill="blue" class="JUQOtc orgUxc" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+                                            </div>
+                                       
+                                        );
+                                        break;
 
-                {/*assign StudentHomeList as a child and pass into it the selected Course object & the current teacherID*/}
-                <StudentHomeList ref={(child) => {
-                    //Assign this.child to the instance of the component studenthomelist
-                    if(!(child == null )){
-                        this.child = child.getWrappedInstance();
+                                    case "video":
+                                         return (
+                                          <div onClick={this.handleClick().bind(this)}>
+                                             <ReactPlayer  key={annotation.annotationID}  className="videoannotation" url={annotation.mediaURL} controls/>
+                                              <svg width="24px" height="24px" fill="blue" class="JUQOtc orgUxc" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+                                            </div>
+                                            
+                           
+                                        );
+                                        break;
+                                } 
+                             })}
+                        </Masonry> 
+                                
+                                  
+                             
+                                 
+                             </Row>
+                            </div>
+                        )  
+                         break;
+                        
+                        default : 
+                            return(
+                                <div>
+                                <div>{sorted[key][0].students[0].firstName}</div>
+                                <Row>
+                                <Masonry className={'my-gallery-class'} options={masonryOptions} >
+                                {sorted[key].map((annotation) => {
+                               
+                                     switch(annotation.contentType){
+                                        case "image":
+                                           return (
+                                                 <div onClick={this.handleClick().bind(this)}>  
+                                                <img className="img-size"   src={annotation.mediaURL}/>
+                                               <svg width="24px" height="24px" fill="blue" class="JUQOtc orgUxc" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+                                            </div>
+                                               );
+                                        break;
+
+                                        case "video":
+                                             return (
+                                                <div onClick={this.handleClick().bind(this)}> 
+                                                    <ReactPlayer className="videoannotation"  url={annotation.mediaURL} controls/>
+                                                 <svg width="24px" height="24px" fill="blue" class="JUQOtc orgUxc" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+                                            </div>
+                                             );
+                                        break;
+                                    }
+                                })} 
+                                </Masonry>
+                                 
+                               
+
+                                </Row>
+                              </div>
+                            )
                     }
-                } } filterStudValue={this.props.match.params.courseID} teacherID={localStorage.getItem('userID')} handler={this.handler.bind(this)}/>
+                    
+                    
+                    })}
+                
+                
 
+               
+                </Grid>
 
             </div>
 
@@ -152,7 +304,7 @@ class Course extends Component{
     }
 }
 
-export default graphql(CourseQuery, {
+export default graphql(MediaQuery, {
     options:  (props) => {  { return { variables: { courseID: props.match.params.courseID, teacherID: localStorage.getItem('userID')} } } }
 })(Course);
 

@@ -37,6 +37,7 @@ static propTypes = {
   };
 
   render = () => (
+      <div>
     <Container>
       
     </Container>  
@@ -89,6 +90,7 @@ static propTypes = {
       <ScreenClassRender style={this.styleFunction}><p style={{ color: 'red' }}>Some red text, which font size depends on the screen class.</p></ScreenClassRender>
 
     </Container>
+      </div>
   );
 }
 
