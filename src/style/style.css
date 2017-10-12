@@ -75,21 +75,33 @@ ul.nav.navbar-nav li a a {
 .logout{
   float: right;
 }
+
 /* Class Page */
 
+.my-gallery-class{
+    margin-top: 30px;
+    margin-bottom: 40px;
+}
 .img-size{
-    width: 30%;
+    width:100%;
 }
 
-div.videoannotation{
-    margin: 1% !important;
-
-/*
-    width: 25% !important;
-    height: auto !important;
-*/
+.media2{
+    width:250px; 
+    height:300px; 
 
 }
+
+div.videomediaannotation{
+    margin-bottom: 1%;
+}
+
+div.videomediaannotation.media video{
+    width:auto !important;
+    padding-bottom: 10px;
+   
+}
+
 
 svg {
     position: absolute;
@@ -105,7 +117,13 @@ svg {
     width: 100px;
     text-align: center;
     margin-top:5px;
-    margin-bottom: 5px;
+    margin-bottom: 20px;
+}
+
+.check{
+    position: absolute;
+    top:0;
+    left:0;
 }
 
 /* home with courses & schedule */
@@ -512,4 +530,11 @@ div.ReactTags__suggestions ul li.ReactTags__activeSuggestion {
 
 .student-description{
     border: 1px solid black;
+}
+
+.student_info_picture{
+  float: left;
+  display: inline-block;
+  width: 30%;
+  margin-top:5px;
 }

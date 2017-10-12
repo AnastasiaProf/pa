@@ -30,8 +30,9 @@ class AllCourses extends React.Component {
         {annotations.map((annotation) => {
             let media =  annotation.uploadedtoMediahubAt;
             let course = annotation.course;
-            if(media == null && !(course == undefined)){
-                if(!(annotation.mediaURL == null)){
+            if(media == null && !(course == undefined) && !(course == null)){
+                if(!(annotation.mediaURL == null) && annotation.category == "media"){
+                 console.log(course.description, annotation)
                     if(!(course.courseID in medias)){
                         medias[course.courseID] = [];
                     }
@@ -43,12 +44,13 @@ class AllCourses extends React.Component {
                         case "video":
                              medias[course.courseID].push(annotation.thumbnailURL)
                             break;
-                    }                    
+                    }  
+                    if(ids.indexOf(course.courseID) == -1 ){
+                        ids.push(course.courseID)
+                        courses.push(course);
+                    }
                 }
-                if(ids.indexOf(course.courseID) == -1 ){
-                    ids.push(course.courseID)
-                    courses.push(course);
-                }
+
             }
         })}
         console.log("medias", medias)
@@ -99,6 +101,7 @@ class AllCourses extends React.Component {
     }
 
     render(){
+        console.log(this);
 
         if (this.props.data.loading){
             return <div>Loading...</div>;

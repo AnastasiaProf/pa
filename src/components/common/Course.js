@@ -38,6 +38,7 @@ const MediaQuery = gql`
             annotationID
             deleted
             category
+            uploadedToMediahubAt
             students{
                 userID
                 firstName
@@ -64,10 +65,9 @@ const MediaQuery = gql`
     }`;
 
 var masonryOptions = {
-    columnWidth: 120,
-    itemSelector: '.media'
+    columnWidth: 80,
+    itemSelector: '.media2'
 };
-
 
 class Course extends Component{
     constructor(props) {
@@ -77,6 +77,7 @@ class Course extends Component{
             list: {},
             filterStud: "",
             showModal: false,
+            annotCheck: []
         };
     }
 
@@ -145,18 +146,22 @@ class Course extends Component{
         let array = {};
         console.log(annotations)
         annotations.map((annotation) => {
-        if(annotation.deleted == false && annotation.category == "mdeia" ){
+            
+        if(annotation.deleted == false && annotation.category == "media" ){
             if(annotation.students.length == 0 ){
                 if(!("allclass" in array)){
                    array["allclass"] = [];
+                   console.log(annotation)  
                 }
                 array["allclass"].push(annotation);
+              
             }else{
                  annotation.students.map((student) => {
                     if(!(student.userID in array)){
                        array[student.userID] = [];
                     }
                     array[student.userID].push(annotation);
+                      
                      
                  })  
             }
@@ -165,10 +170,20 @@ class Course extends Component{
         return(array);
     }
     
-    handleClick(e){
-        e.preventDefault();
-      alert("toto");
-    }
+    
+    toggleChange(event) {
+        event.target.id;
+        console.log( event.target.id);
+        let array = this.state.annotCheck;
+        
+        if (array.indexOf(event.target.id ) >= 0){
+             array.splice(array.indexOf(event.target.id ), 1);
+        }else{
+            array.push(event.target.id);
+        }
+        
+        this.setState({annotCheck: array});    
+  }
     
     render(){
         console.log(this);
@@ -179,7 +194,7 @@ class Course extends Component{
         let annotweek = this.generateWeeks();
         
         let sorted = this.sortAnnot(this.props.data.annotations);
-        console.log(sorted)
+    
         return(
             <div>
                 <Grid>
@@ -188,7 +203,7 @@ class Course extends Component{
                         <Col xs={12} md={12} >
                             <div className="course-description"><h2>{this.props.data.course.description}</h2></div>
                             <Link className="btn back class" to={`/`}><Glyphicon glyph="chevron-left" /> Back</Link>
-                            <FormControl className="class-tag-filter" onChange={this.sortStud.bind(this)} componentClass="select" placeholder="select">
+                            {/*<FormControl className="class-tag-filter" onChange={this.sortStud.bind(this)} componentClass="select" placeholder="select">
                                 <option value="name">Name</option>
                                 <option value="fbmonth">Feedback this month</option>
                                 <option value="fbcurrweek">Feedback this week</option>
@@ -199,15 +214,15 @@ class Course extends Component{
                                 <Modal.Header closeButton>
                                     <Modal.Title>Select the week</Modal.Title>
                                 </Modal.Header>
-                                <Modal.Body>
+                                <Modal.Body>*/}
                                     {/*show the list of the week where annotaions were created ...*/}
-                                    <ul className="week-selector">
+                                    {/*<ul className="week-selector">
                                         {annotweek.map((week) => {
                                             return <ListGroupItem key={week} id={week} onClick={this.sortStud.bind(this)}>{week}</ListGroupItem>
                                         })}
                                     </ul>
                                 </Modal.Body>
-                            </Modal>
+                            </Modal>*/}
                         </Col>
                     </Row>
                 </Grid>
@@ -226,8 +241,12 @@ class Course extends Component{
                                  switch(annotation.contentType){
                                     case "image":
                                        return (
-                                            <div>
-                                            <img onClick={this.handleClick.bind(this)} className="img-size media"  key={annotation.annotationID}/>
+                                            <div className="media2">
+                                            <img className="img-size media"  key={annotation.annotationID}/>
+                                              <input className="check" type="checkbox"
+                                                  id={annotation.annotationID}
+                                                  onChange={this.toggleChange.bind(this)}
+                                                /> 
                                             </div>
                                        
                                         );
@@ -235,9 +254,12 @@ class Course extends Component{
 
                                     case "video":
                                          return (
-                                          <div>
-                                             <ReactPlayer onClick={this.handleClick.bind(this)} key={annotation.annotationID}  className="videoannotation media" url={annotation.mediaURL} controls/>
-                                              
+                                          <div className="media2">
+                                             <ReactPlayer  key={annotation.annotationID}  className="videomediaannotation media" url={annotation.mediaURL} controls/>
+                                             <input className="check" type="checkbox"
+                                             id={annotation.annotationID}
+                                              onChange={this.toggleChange.bind(this)}
+                                            />
                                             </div>
                                             
                            
@@ -266,18 +288,24 @@ class Course extends Component{
                                      switch(annotation.contentType){
                                         case "image":
                                            return (
-                                                 <div>  
-                                                <img onClick={this.handleClick.bind(this)}  className="img-size media"   src={annotation.mediaURL}/>
-                                               
+                                                 <div className="media2">  
+                                                <img  className="img-size media"   src={annotation.mediaURL}/>
+                                               <input className="check" type="checkbox"
+                                              id={annotation.annotationID}
+                                              onChange={this.toggleChange.bind(this)}
+                                            />
                                             </div>
                                                );
                                         break;
 
                                         case "video":
                                              return (
-                                                <div> 
-                                                    <ReactPlayer  onClick={this.handleClick.bind(this)} className="videoannotation media"  url={annotation.mediaURL} controls/>
-                                                 
+                                                <div className="media2"> 
+                                                    <ReactPlayer  className="videomediaannotation media"  url={annotation.mediaURL} controls/>
+                                                 <input className="check" type="checkbox"
+                                              id={annotation.annotationID}
+                                              onChange={this.toggleChange.bind(this)}
+                                            />
                                             </div>
                                              );
                                         break;

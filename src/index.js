@@ -19,8 +19,8 @@ import Login from './components/common/Login'
 
 
 const networkInterface = createNetworkInterface({
-    uri: 'https://effeedbackapp-dev.herokuapp.com/api/graphql'
-    //uri: 'https://effeedbackapp-qa.herokuapp.com/api/graphql'
+    //uri: 'https://effeedbackapp-dev.herokuapp.com/api/graphql'
+    uri: 'https://effeedbackapp-qa.herokuapp.com/api/graphql'
 });
 
 networkInterface.use([{

@@ -102,7 +102,7 @@ class StudentList extends React.Component {
 
 
     render() {
-
+        console.log(this);
         if (this.props.loading){
             return <div>Loading...</div>;
         }

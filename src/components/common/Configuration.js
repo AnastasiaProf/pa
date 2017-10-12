@@ -42,13 +42,13 @@ static propTypes = {
       
     </Container>  
     <Container>
-      <h1>Responsive grid example</h1>
+      <h1>Report</h1>
 
       <Row>
         <Col sm={6} className="student-description">
           <Row>
             <Col sm={6} >
-                <img className="student-picture" src="https://www.shareicon.net/data/2016/06/26/786560_people_512x512.png"/>
+                <img className="student_info_picture" src="https://www.shareicon.net/data/2016/06/26/786560_people_512x512.png"/>
             </Col>
             <Col sm={6}>
                 <p> Name </p>
@@ -58,13 +58,13 @@ static propTypes = {
           </Row> 
         </Col>
         <Col sm={6} className="graph">
-          One of three columns
+          Graph area
         </Col>
       </Row>
 
-      <h1>Responsive utilties example</h1>
+      <h1>Details</h1>
 
-      <p>
+      {/*<p>
         <span>Your current screen class is </span>
         <Visible xs><strong>xs</strong></Visible>
         <Visible sm><strong>sm</strong></Visible>
@@ -85,9 +85,8 @@ static propTypes = {
       </Visible>
       <Hidden md lg>
         <p>Paragraph hidden on medium and large.</p>
-      </Hidden>
+      </Hidden>*/}
 
-      <ScreenClassRender style={this.styleFunction}><p style={{ color: 'red' }}>Some red text, which font size depends on the screen class.</p></ScreenClassRender>
 
     </Container>
       </div>
