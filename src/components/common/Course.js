@@ -16,6 +16,7 @@ import React, {Component} from 'react';
 import { graphql ,gql} from 'react-apollo';
 import { Link } from 'react-router-dom';
 import {FormControl, Modal, Grid,Row,Col,Glyphicon,ListGroupItem} from 'react-bootstrap';
+import { StickyContainer, Sticky } from 'react-sticky';
 import currentWeekNumber from 'current-week-number';
 import Masonry from 'react-masonry-component';
 import ReactPlayer from 'react-player';
@@ -170,6 +171,18 @@ class Course extends Component{
         return(array);
     }
     
+    countAnnot(annotations, contentType){
+        let count = 0; 
+        
+           annotations.map((annotation) => {
+                if (annotation.contentType == contentType && annotation.deleted == false && annotation.category == "media"){
+                    console.log(annotation)
+                    count += 1;
+                }
+            })
+            
+            return count;  
+    }
     
     toggleChange(event) {
         event.target.id;
@@ -188,15 +201,54 @@ class Course extends Component{
     render(){
         console.log(this);
         let course = "";
+        
+       
+        
         if (this.props.data.loading){
             return <div>Loading...</div>;
         }
         let annotweek = this.generateWeeks();
         
         let sorted = this.sortAnnot(this.props.data.annotations);
+        
+        let photo = this.countAnnot( this.props.data.annotations, "image");
+        let video = this.countAnnot( this.props.data.annotations, "video");
     
         return(
             <div>
+                  <StickyContainer>
+                      <Sticky >
+                      {
+                        ({
+                          style,
+                          isSticky,
+                          distanceFromBottom,
+                          calculatedHeight
+                        }) => {
+                            if(this.state.annotCheck.length == 0){
+                              return (        
+                                <header style={{ position: 'fixed' , bottom: 0 , left: 0 , zIndex: 1000, width: "100%" }}>
+                                      <div style={{height: 80, overflow: 'auto', background: '#aaa'}}>
+                                        <h2 className="selected">
+                                            <span>{photo} Photos</span> <span>{video} Videos</span>
+                                        </h2>
+                                      </div>  
+                               </header>
+                              )
+                            }else{
+                                 return (     
+                                    <header style={{ position: 'fixed' , bottom: 0 , left: 0 , zIndex: 1000, width: "100%" }}>
+                                          <div style={{height: 80, overflow: 'auto', background: '#aaa'}}>
+                                            <h2 className="selected">
+                                                <span >{this.state.annotCheck.length} Selected</span>
+                                            </h2>
+                                          </div>  
+                                   </header>
+                                )
+                            }
+                        }
+                      }
+                    </Sticky>
                 <Grid>
                     <Row className="show-grid">
                         {/*dropdown for sorting by ...*/}
@@ -227,7 +279,9 @@ class Course extends Component{
                     </Row>
                 </Grid>
                                     
-                                    
+                 
+                    
+                                  
                  <Grid>
                   {Object.keys(sorted).map((key) => {
                     switch(key){
@@ -316,6 +370,7 @@ class Course extends Component{
                                
 
                                 </Row>
+                                
                               </div>
                             )
                     }
@@ -323,10 +378,11 @@ class Course extends Component{
                     
                     })}
                 
-                
-
                
                 </Grid>
+                
+                 </StickyContainer> 
+                    
 
             </div>
 

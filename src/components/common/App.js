@@ -44,7 +44,7 @@ class App extends Component {
                             </Navbar.Header>
                             <Navbar.Collapse>
                               <Nav>
-                                <NavItem eventKey={1}><Link to={`/`}>Home</Link></NavItem>
+                                <NavItem eventKey={1}><Link to={`/`}>Review Media</Link></NavItem>
                                 <NavItem eventKey={2}><Link to={`/students`}>Students</Link></NavItem>
                                 <NavItem eventKey={2}><Link to={`/configuration`}>Settings</Link></NavItem>
                               </Nav>

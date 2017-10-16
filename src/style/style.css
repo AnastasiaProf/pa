@@ -78,6 +78,13 @@ ul.nav.navbar-nav li a a {
 
 /* Class Page */
 
+.review-title{
+    text-align: center;
+    color: rgb(217,83,79);
+    font-weight: lighter;
+    margin-bottom: 5%;
+}
+
 .my-gallery-class{
     margin-top: 30px;
     margin-bottom: 40px;
@@ -100,6 +107,11 @@ div.videomediaannotation.media video{
     width:auto !important;
     padding-bottom: 10px;
    
+}
+
+.selected{
+    margin-top:2% !important;
+    margin-left: 2% !important;
 }
 
 

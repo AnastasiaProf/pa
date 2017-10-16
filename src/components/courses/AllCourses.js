@@ -63,19 +63,22 @@ class AllCourses extends React.Component {
     renderCourses(){
         var annotations = this.props.data.annotations;
         let teacherID = this.props.teacherID;
-        
+        console.log(annotations)
         let array = this.courseArray(annotations);
         let courses = array[0];
         let medias = array[1];
            
         return (
             <ul>
+                <h1 className="review-title">{courses.length} Lessons Pending to Review</h1>
                 
                 {courses.map((course, i) => {
                         var annot_nbr = 0;
                     
                         return (
+                            
                             <Col xs={12} md={6} key={i} >
+                                
                                 <ListGroupItem  className="mediabox">
                                     <Link to={`/${course.courseID}`}><h4>{course.description}</h4></Link>
                                     {
@@ -123,8 +126,6 @@ class AllCourses extends React.Component {
 }
 
 
-
-
-export default graphql(CourseReviewMediaQuery,CourseQuery, {
-    options:  (props) => {  { return { variables: { teacherID: props.teacherID} } } }
+export default graphql(CourseReviewMediaQuery, {
+    options:  (props) => {  { return { variables: { filterCourseIDs: props.coursesID, filterContentTypes: ["image", "video"], showDeleted: false} } } }
 })(AllCourses)
