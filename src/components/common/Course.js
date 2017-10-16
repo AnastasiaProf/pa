@@ -228,20 +228,20 @@ class Course extends Component{
                             if(this.state.annotCheck.length == 0){
                               return (        
                                 <header style={{ position: 'fixed' , bottom: 0 , left: 0 , zIndex: 1000, width: "100%" }}>
-                                      <div style={{height: 80, overflow: 'auto', background: '#aaa'}}>
-                                        <h2 className="selected">
+                                      <div style={{height: 80, overflow: 'auto', background: '#fff'}}>
+                                        <h4 className="selected">
                                             <span>{photo} Photos</span> <span>{video} Videos</span>
-                                        </h2>
+                                        </h4>
                                       </div>  
                                </header>
                               )
                             }else{
                                  return (     
                                     <header style={{ position: 'fixed' , bottom: 0 , left: 0 , zIndex: 1000, width: "100%" }}>
-                                          <div style={{height: 80, overflow: 'auto', background: '#aaa'}}>
-                                            <h2 className="selected">
+                                          <div style={{height: 80, overflow: 'auto', background: '#fff'}}>
+                                            <h4 className="selected">
                                                 <span >{this.state.annotCheck.length} Selected</span>
-                                            </h2>
+                                            </h4>
                                           </div>  
                                    </header>
                                 )
@@ -297,10 +297,10 @@ class Course extends Component{
                                        return (
                                             <div className="media2">
                                             <img className="img-size media"  key={annotation.annotationID}/>
-                                              <input className="check" type="checkbox"
-                                                  id={annotation.annotationID}
-                                                  onChange={this.toggleChange.bind(this)}
-                                                /> 
+                                            <div className="round">
+                                                <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} /> 
+                                                <label htmlFor={annotation.annotationID}></label>
+                                             </div>
                                             </div>
                                        
                                         );
@@ -310,10 +310,10 @@ class Course extends Component{
                                          return (
                                           <div className="media2">
                                              <ReactPlayer  key={annotation.annotationID}  className="videomediaannotation media" url={annotation.mediaURL} controls/>
-                                             <input className="check" type="checkbox"
-                                             id={annotation.annotationID}
-                                              onChange={this.toggleChange.bind(this)}
-                                            />
+                                                 <div className="round">
+                                                    <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} />
+                                                     <label htmlFor={annotation.annotationID}></label>
+                                                </div>
                                             </div>
                                             
                            
@@ -344,10 +344,10 @@ class Course extends Component{
                                            return (
                                                  <div className="media2">  
                                                 <img  className="img-size media"   src={annotation.mediaURL}/>
-                                               <input className="check" type="checkbox"
-                                              id={annotation.annotationID}
-                                              onChange={this.toggleChange.bind(this)}
-                                            />
+                                                <div className="round">
+                                                    <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} />
+                                                    <label htmlFor={annotation.annotationID}></label>
+                                                </div>
                                             </div>
                                                );
                                         break;
@@ -356,11 +356,11 @@ class Course extends Component{
                                              return (
                                                 <div className="media2"> 
                                                     <ReactPlayer  className="videomediaannotation media"  url={annotation.mediaURL} controls/>
-                                                 <input className="check" type="checkbox"
-                                              id={annotation.annotationID}
-                                              onChange={this.toggleChange.bind(this)}
-                                            />
-                                            </div>
+                                                    <div className="round">
+                                                        <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)}/>
+                                                        <label htmlFor={annotation.annotationID}></label>
+                                                    </div>
+                                                </div>
                                              );
                                         break;
                                     }
