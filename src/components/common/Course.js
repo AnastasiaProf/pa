@@ -13,9 +13,9 @@
 //                } } filterStudValue={this.props.match.params.courseID} teacherID={localStorage.getItem('userID')} handler={this.handler.bind(this)}/>
 
 import React, {Component} from 'react';
-import { graphql ,gql} from 'react-apollo';
+import { graphql ,gql, compose} from 'react-apollo';
 import { Link } from 'react-router-dom';
-import {FormControl, Modal, Grid,Row,Col,Glyphicon,ListGroupItem} from 'react-bootstrap';
+import {FormControl, Modal, Grid,Row,Col,Glyphicon,ListGroupItem, Button} from 'react-bootstrap';
 import { StickyContainer, Sticky } from 'react-sticky';
 import currentWeekNumber from 'current-week-number';
 import Masonry from 'react-masonry-component';
@@ -23,7 +23,7 @@ import ReactPlayer from 'react-player';
 import StudentHomeList from '../student/StudentHomeList';
 
 const MediaQuery = gql`    
-    query MediaQuery($courseID: ID!) {
+    query MediaQuery($courseID: ID!,$hideMediahubUploaded: Boolean!) {
         course(courseID: $courseID) {
             courseID                                                       
             courseName
@@ -35,7 +35,7 @@ const MediaQuery = gql`
             createdAt
             updatedAt
         }
-        annotations(filterCourseIDs:[$courseID]) {
+        annotations(filterCourseIDs:[$courseID], hideMediahubUploaded:$hideMediahubUploaded) {
             annotationID
             deleted
             category
@@ -66,14 +66,15 @@ const MediaQuery = gql`
     }`;
 
 var masonryOptions = {
-    columnWidth: 80,
-    itemSelector: '.media2'
+    fitWidth: true,
+    itemSelector: '.media2',
+    gutter: 5
 };
 
 class Course extends Component{
     constructor(props) {
         super(props);
-
+        
         this.state = {
             list: {},
             filterStud: "",
@@ -145,42 +146,41 @@ class Course extends Component{
     sortAnnot(annotations){
         
         let array = {};
-        console.log(annotations)
-        annotations.map((annotation) => {
-            
-        if(annotation.deleted == false && annotation.category == "media" ){
-            if(annotation.students.length == 0 ){
-                if(!("allclass" in array)){
-                   array["allclass"] = [];
-                   console.log(annotation)  
-                }
-                array["allclass"].push(annotation);
-              
-            }else{
-                 annotation.students.map((student) => {
-                    if(!(student.userID in array)){
-                       array[student.userID] = [];
+        if(annotations.length > 0){
+            annotations.map((annotation) => {
+
+            if(annotation.deleted == false && annotation.category == "media" ){
+                if(annotation.students.length == 0 ){
+                    if(!("allclass" in array)){
+                       array["allclass"] = []; 
                     }
-                    array[student.userID].push(annotation);
-                      
-                     
-                 })  
-            }
-          } 
-        })
+                    array["allclass"].push(annotation);
+
+                }else{
+                     annotation.students.map((student) => {
+                        if(!(student.userID in array)){
+                           array[student.userID] = [];
+                        }
+                        array[student.userID].push(annotation);
+
+
+                     })  
+                }
+              } 
+            })
+        } 
         return(array);
     }
     
     countAnnot(annotations, contentType){
         let count = 0; 
-        
+        if(annotations.length > 0){
            annotations.map((annotation) => {
                 if (annotation.contentType == contentType && annotation.deleted == false && annotation.category == "media"){
-                    console.log(annotation)
                     count += 1;
                 }
             })
-            
+        } 
             return count;  
     }
     
@@ -197,6 +197,17 @@ class Course extends Component{
         
         this.setState({annotCheck: array});    
   }
+    
+    onSubmit(event){
+        event.preventDefault();
+        let annot = this.state.annotCheck;
+        
+        this.props.mutate({
+            variables:{
+                "annotationIDs" : annot,
+            },
+        }).then(() => this.setState({annotCheck:[]}));
+    }
     
     render(){
         console.log(this);
@@ -232,6 +243,7 @@ class Course extends Component{
                                         <h4 className="selected">
                                             <span>{photo} Photos</span> <span>{video} Videos</span>
                                         </h4>
+                                        <Button className="publish">Publish</Button>
                                       </div>  
                                </header>
                               )
@@ -282,7 +294,7 @@ class Course extends Component{
                  
                     
                                   
-                 <Grid>
+                 <Grid className="wide">
                   {Object.keys(sorted).map((key) => {
                     switch(key){
                         case "allclass":
@@ -295,26 +307,26 @@ class Course extends Component{
                                  switch(annotation.contentType){
                                     case "image":
                                        return (
-                                            <div className="media2">
-                                            <img className="img-size media"  key={annotation.annotationID}/>
+                                            <span className="media2 images">
+                                            <img className="img-size media"  key={annotation.annotationID} />
                                             <div className="round">
                                                 <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} /> 
                                                 <label htmlFor={annotation.annotationID}></label>
                                              </div>
-                                            </div>
+                                            </span>
                                        
                                         );
                                         break;
 
                                     case "video":
                                          return (
-                                          <div className="media2">
+                                          <span className="media2">
                                              <ReactPlayer  key={annotation.annotationID}  className="videomediaannotation media" url={annotation.mediaURL} controls/>
                                                  <div className="round">
                                                     <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} />
                                                      <label htmlFor={annotation.annotationID}></label>
                                                 </div>
-                                            </div>
+                                            </span>
                                             
                            
                                         );
@@ -342,25 +354,25 @@ class Course extends Component{
                                      switch(annotation.contentType){
                                         case "image":
                                            return (
-                                                 <div className="media2">  
+                                                 <span className="media2 images">  
                                                 <img  className="img-size media"   src={annotation.mediaURL}/>
                                                 <div className="round">
                                                     <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} />
                                                     <label htmlFor={annotation.annotationID}></label>
                                                 </div>
-                                            </div>
+                                            </span>
                                                );
                                         break;
 
                                         case "video":
                                              return (
-                                                <div className="media2"> 
+                                                <span className="media2"> 
                                                     <ReactPlayer  className="videomediaannotation media"  url={annotation.mediaURL} controls/>
                                                     <div className="round">
                                                         <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)}/>
                                                         <label htmlFor={annotation.annotationID}></label>
                                                     </div>
-                                                </div>
+                                                </span>
                                              );
                                         break;
                                     }
@@ -390,7 +402,19 @@ class Course extends Component{
     }
 }
 
-export default graphql(MediaQuery, {
-    options:  (props) => {  { return { variables: { courseID: props.match.params.courseID, teacherID: localStorage.getItem('userID')} } } }
-})(Course);
+/*
+ * Mutation Query
+ * @args $annotationIDs: [ID!]
+ */
+const mutation = gql`
+	mutation uploadAnnotationToMediahub ($annotationIDs: [ID!]){
+  		uploadAnnotationToMediahub(annotationIDs:$annotationIDs)	
+	}
+`;
+
+export default compose(
+    graphql(MediaQuery, {
+    options:  (props) => {  { return { variables: { courseID: props.match.params.courseID, teacherID: localStorage.getItem('userID'), hideMediahubUploaded:true} } } }}),
+    graphql(mutation)
+)(Course);
 

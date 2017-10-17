@@ -8,6 +8,10 @@ a h4{
   cursor: pointer;
 }
 
+.footer{
+    height:50px;
+}
+
 /* header */
 h1, h2, p, ul, li {
   font-family: Helvetica, Arial, sans-serif;
@@ -31,7 +35,6 @@ ul.nav.navbar-nav li a a {
 
 .content {
   background-color: rgb(242, 242, 242);
-  padding: 20px;
 }
 .content h2 {
   padding: 0;
@@ -86,19 +89,40 @@ ul.nav.navbar-nav li a a {
 }
 
 .my-gallery-class{
-    margin-top: 30px;
-    margin-bottom: 40px;
+     margin: 0 auto;
+     min-height: 0; 
+     min-width: 0; 
 }
+
+.wide{
+    margin-bottom:3%;
+}
+
+.media2 {
+   display:inline-block;
+    margin-bottom: 10px;
+    min-height: 0;
+}
+
+.media2.images{
+    width: 250px; 
+}
+
 .img-size{
     width:100%;
 }
 
+/*
 .media2{
     width:250px; 
     height:300px; 
+    overflow: hidden;
+    margin-bottom: 10px;
 
 }
+*/
 
+/*
 div.videomediaannotation{
     margin-bottom: 1%;
 }
@@ -108,12 +132,14 @@ div.videomediaannotation.media video{
     padding-bottom: 10px;
    
 }
+*/
 
 .selected{
     margin-top:2% !important;
     margin-left: 20% !important;
     font-size: 18px !important;
     font-weight: 600;
+    display: inline-block;
 }
 
 
@@ -185,6 +211,23 @@ svg {
 
 .round input[type="checkbox"]:checked + label:after {
   opacity: 1;
+}
+
+.publish{
+    display: inline-block;
+    background-image: none !important;
+    background-color: #0375D8 !important;
+    color: white;
+    font-weight: 500;
+    padding: 1% 5% 1% 5%;
+    text-shadow: none;
+    border: 0px !important; 
+    box-shadow: none;
+    margin-left: 30%;
+}
+
+.publish :hover {
+    color: black;
 }
 
 /* home with courses & schedule */

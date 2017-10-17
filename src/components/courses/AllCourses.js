@@ -26,35 +26,34 @@ class AllCourses extends React.Component {
         let courses = [];
         let ids = [];
         let medias = [];
-        
-        {annotations.map((annotation) => {
-            let media =  annotation.uploadedtoMediahubAt;
-            let course = annotation.course;
-            if(media == null && !(course == undefined) && !(course == null)){
-                if(!(annotation.mediaURL == null) && annotation.category == "media"){
-                 console.log(course.description, annotation)
-                    if(!(course.courseID in medias)){
-                        medias[course.courseID] = [];
-                    }
-                    switch(annotation.contentType){
-                        case "image":
-                            medias[course.courseID].push(annotation.mediaURL)
-                            break;
-                            
-                        case "video":
-                             medias[course.courseID].push(annotation.thumbnailURL)
-                            break;
-                    }  
-                    if(ids.indexOf(course.courseID) == -1 ){
-                        ids.push(course.courseID)
-                        courses.push(course);
-                    }
-                }
+        if(annotations.length > 0){
+            {annotations.map((annotation) => {
+                let media =  annotation.uploadedtoMediahubAt;
+                let course = annotation.course;
+                if(media == null && !(course == undefined) && !(course == null)){
+                    if(!(annotation.mediaURL == null) && annotation.category == "media"){
+                     console.log(course.description, annotation)
+                        if(!(course.courseID in medias)){
+                            medias[course.courseID] = [];
+                        }
+                        switch(annotation.contentType){
+                            case "image":
+                                medias[course.courseID].push(annotation.mediaURL)
+                                break;
 
-            }
-        })}
-        console.log("medias", medias)
-        console.log("courses", courses)
+                            case "video":
+                                 medias[course.courseID].push(annotation.thumbnailURL)
+                                break;
+                        }  
+                        if(ids.indexOf(course.courseID) == -1 ){
+                            ids.push(course.courseID)
+                            courses.push(course);
+                        }
+                    }
+
+                }
+            })}
+        }
         
         return([courses, medias]);
     }
@@ -127,5 +126,5 @@ class AllCourses extends React.Component {
 
 
 export default graphql(CourseReviewMediaQuery, {
-    options:  (props) => {  { return { variables: { filterCourseIDs: props.coursesID, filterContentTypes: ["image", "video"], showDeleted: false} } } }
+    options:  (props) => {  { return { variables: { filterCourseIDs: props.coursesID, filterCategory: "media", showDeleted: false, hideMediahubUploaded:true} } } }
 })(AllCourses)

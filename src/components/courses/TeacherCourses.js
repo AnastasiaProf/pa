@@ -22,10 +22,11 @@ class TeacherCourses extends React.Component {
     getCoursesID(courses){
         let coursesID = [];
         
-        courses.map((course) => {
-            coursesID.push(course.courseID);
-        })
-        
+        if(courses.length > 0){
+            courses.map((course) => {
+                coursesID.push(course.courseID);
+            })
+        } 
         return coursesID;
     }
 

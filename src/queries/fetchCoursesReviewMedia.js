@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const CourseReviewMediaQuery = gql`
-  query CourseReviewMediaQuery($filterCourseIDs: [ID]!, $filterContentTypes: [AnnotationContentType]!, $showDeleted: Boolean!){
-    annotations(filterCourseIDs: $filterCourseIDs, filterContentTypes: $filterContentTypes, showDeleted: $showDeleted){
+  query CourseReviewMediaQuery($filterCourseIDs: [ID]!, $filterCategory:AnnotationCategoryType!, $showDeleted: Boolean!, $hideMediahubUploaded: Boolean!){
+    annotations(filterCourseIDs: $filterCourseIDs, filterCategory: $filterCategory, showDeleted: $showDeleted, hideMediahubUploaded: $hideMediahubUploaded){
       mediaURL
       thumbnailURL
       annotationID
