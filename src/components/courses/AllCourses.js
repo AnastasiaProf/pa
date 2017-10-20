@@ -80,7 +80,7 @@ class AllCourses extends React.Component {
                             <Col xs={12} md={6} key={i} >
                                 
                                 <ListGroupItem  className="mediabox">
-                                    <Link to={`/${course.courseID}`}><h4>{course.description}</h4></Link>
+                                    <Link to={`/media/${course.courseID}`}><h4>{course.description}</h4></Link>
                                     {
                                     medias[course.courseID] == undefined ? null :
                                         medias[course.courseID].map((mediaURL,j) => {
