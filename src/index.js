@@ -69,10 +69,10 @@ const Root = () => {
                         <Route  exact path="/signin" component={Login}/>
                         <AuthenticatedRoute  exact path="/configuration" component={Configuration}/>
                         <AuthenticatedRoute  exact path="/students/" component={Students}/>
-                        <AuthenticatedRoute  exact path="/:courseID" component={Course}/>
-                        <AuthenticatedRoute  exact path="/:courseID/class" component={CoursePage}/>
+                        <AuthenticatedRoute  exact path="/media/:courseID" component={Course}/>
+                        <AuthenticatedRoute  exact path="/media/:courseID/class" component={CoursePage}/>
                         <AuthenticatedRoute  exact path="/" component={Home}/>
-                        <AuthenticatedRoute  path="/:courseID/students/:userID" component={StudentPage}/>
+                        <AuthenticatedRoute  path="/media/:courseID/students/:userID" component={StudentPage}/>
                     </Switch>
                 </App>
             </BrowserRouter >
