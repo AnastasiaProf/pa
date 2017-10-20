@@ -355,12 +355,12 @@ class Course extends Component{
                         <Col xs={12} md={12} >
                             <div className="course-description"><h2>{this.props.data.course.description}</h2></div>
                             <Link className="btn back class" to={`/`}><Glyphicon glyph="chevron-left" /> Back</Link>
-                            <Button onClick={this.testPubNub.bind(this)}>PubNub</Button>
+                             {/*<Button onClick={this.testPubNub.bind(this)}>PubNub</Button>
                             <div>
                               <ul>
                                 {messages.map((m, index) => !(m.message == undefined) ? <li key={'The media was published successfully !' + index}>{m.message.type}</li> : null)}
                               </ul>
-                            </div>
+                            </div>*/}
                             {/*<FormControl className="class-tag-filter" onChange={this.sortStud.bind(this)} componentClass="select" placeholder="select">
                                 <option value="name">Name</option>
                                 <option value="fbmonth">Feedback this month</option>
