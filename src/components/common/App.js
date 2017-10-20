@@ -15,17 +15,17 @@ class App extends Component {
 
     constructor(props) {
         super(props);
-        var props = props;
+        
         //On logout delete all the localsotrage and get rid of query cache
         this.logout = () => {
             localStorage.removeItem('token');
             localStorage.removeItem('userID')
-//            .then(() =>
-//                props.client.resetStore()
-//            )
-//            .catch(err =>
-//                console.error('Logout failed', err)
-//            );
+            .then(() =>
+                props.client.resetStore()
+            )
+            .catch(err =>
+                console.error('Logout failed', err)
+            );
         }
     }
 

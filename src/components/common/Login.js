@@ -9,6 +9,7 @@ import { graphql } from 'react-apollo';
 import { Redirect } from 'react-router-dom';
 import {Grid,Row,Col, Alert} from 'react-bootstrap';
 import logo from '../../blacklogo.png';
+import Spinner from 'react-spinkit';
 
 
 
@@ -19,17 +20,22 @@ class Login extends Component{
         this.state = {
             email: '',
             password: '',
-            error: false
+            error: false,
+            loading: false
 
         };
     }
+    
+   
 
     onSubmit(e){
     	e.preventDefault();
 
         let email = this.state.email;
         let password = this.state.password;
-
+        
+        this.setState({loading: true});
+        
         this.props.mutate({
             variables: {
                 "email": email,
@@ -41,7 +47,7 @@ class Login extends Component{
                 localStorage.setItem('userID', response.data.authToken.user.userID);
                 window.location.replace('/');
             } else {
-                this.setState({error: true})
+                this.setState({loading: false, error: true})
             }
 
         });
@@ -49,7 +55,13 @@ class Login extends Component{
 
 
 	render(){
-
+        if (this.state.loading){
+            return( 
+                <div className="loading">
+                    <Spinner className="loader" name="ball-pulse-rise" color="rgb(217, 83, 79)"/>
+                </div>
+            );
+        }
 		return(
 			<div>
 				<Grid>

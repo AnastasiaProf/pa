@@ -20,6 +20,7 @@ import { StickyContainer, Sticky } from 'react-sticky';
 import currentWeekNumber from 'current-week-number';
 import Masonry from 'react-masonry-component';
 import ReactPlayer from 'react-player';
+import PubNubReact from 'pubnub-react';
 import StudentHomeList from '../student/StudentHomeList';
 
 const MediaQuery = gql`    
@@ -61,7 +62,6 @@ const MediaQuery = gql`
             createdAt
             updatedAt
             transcribedAt
-            deleted
     }
     }`;
 
@@ -75,6 +75,8 @@ class Course extends Component{
     constructor(props) {
         super(props);
         
+         this.pubnub = new PubNubReact({ publishKey: 'pub-c-9913e601-5fba-4c54-9b42-c234a93843b9', subscribeKey: 'sub-c-f213e53a-b270-11e7-9eb5-def16b84ebc1' });
+        
         this.state = {
             list: {},
             filterStud: "",
@@ -82,10 +84,35 @@ class Course extends Component{
             annotCheck: []
         };
     }
+    
+   
+    componentWillMount() {
+        this.pubnub.init(this);
+        let courseID = this.props.match.params.courseID;
+        this.pubnub.subscribe({ channels: [courseID], withPresence: true, autoload: 100});
+    
+        this.pubnub.getStatus((st) => {
+            console.log('st', st);
 
+        });
+        this.pubnub.getMessage(courseID, (msg) => {
+            if(msg.message.type == "mediahub"){
+                this.props.data.refetch();
+            }
+        });
+    };
 
     componentDidMount(){
         this.setState({list: this.child});
+    }
+    
+    testPubNub(){
+                let courseID = this.props.match.params.courseID;
+
+                     this.pubnub.publish({channel: courseID, message: 'Hello!'}, (response) => {
+                console.log('resp', response);
+        
+        });
     }
 
     //onChange set StudentHomeList.state.sortStud at dropdown value
@@ -157,14 +184,19 @@ class Course extends Component{
                     array["allclass"].push(annotation);
 
                 }else{
-                     annotation.students.map((student) => {
-                        if(!(student.userID in array)){
-                           array[student.userID] = [];
-                        }
-                        array[student.userID].push(annotation);
-
-
+                     let index = "";
+                
+                     annotation.students.map((student, i) => {
+                       index += student.userID;
+                         if(!(i+1 == annotation.students.length)){
+                            index += ",";
+                         }
+                       
                      })  
+                      if(!(index in array)){
+                           array[index] = [];
+                        }
+                        array[index].push(annotation);
                 }
               } 
             })
@@ -186,7 +218,6 @@ class Course extends Component{
     
     toggleChange(event) {
         event.target.id;
-        console.log( event.target.id);
         let array = this.state.annotCheck;
         
         if (array.indexOf(event.target.id ) >= 0){
@@ -198,23 +229,77 @@ class Course extends Component{
         this.setState({annotCheck: array});    
   }
     
+    unCheck(){
+        this.state.annotCheck.forEach(function(e){
+            let ref = 'ref_' + e;
+            this.refs[ref].checked = !this.refs[ref].checked;
+        }, this)
+
+    }
+    
     onSubmit(event){
         event.preventDefault();
         let annot = this.state.annotCheck;
+        let course = this.props.data.course.courseID;
+        this.props.mutate({
+            variables:{
+                annotationIDs : annot,
+            },
+            refetchQueries: [{
+                query: MediaQuery,
+                variables: { courseID: course, hideMediahubUploaded: true },
+            },]
+        }).then(() => this.setState({annotCheck:[]}));
+        this.unCheck()
+
+    }
+    
+    onSubmitAll(event){
+        event.preventDefault();
+        let annots = [];
+        this.props.data.annotation.forEach(function(e){
+            if(e.deleted == false && e.category == "media" ){
+                annots.push(e.annotationID)
+            }
+        });
+        
+        if(annots == []){
+            return null;
+        }
         
         this.props.mutate({
             variables:{
-                "annotationIDs" : annot,
+                "annotationIDs" : annots,
             },
-        }).then(() => this.setState({annotCheck:[]}));
+        })
     }
     
+//    addMedia(){
+//        
+//         let course = this.props.data.course.courseID;
+//        
+//         this.props.mutate({
+//             variables: {
+//                "annotation": {
+//                    contentType: "image",
+//                    category: "media",
+//                    mediaURL: 'https://cdn.theatlantic.com/assets/media/img/photo/2015/11/images-from-the-2016-sony-world-pho/s01_130921474920553591/main_900.jpg',
+//                    teacherID: localStorage.getItem('userID'),
+//                    studentIDs: [],
+//                    tags: [],
+//                    deleted: false,
+//                    courseID: course,
+//                    //localCreatedAt : local,
+//                }
+//            }
+//         })
+//    }
+    
     render(){
-        console.log(this);
         let course = "";
         
        
-        
+        console.log(this)
         if (this.props.data.loading){
             return <div>Loading...</div>;
         }
@@ -224,7 +309,9 @@ class Course extends Component{
         
         let photo = this.countAnnot( this.props.data.annotations, "image");
         let video = this.countAnnot( this.props.data.annotations, "video");
-    
+        
+        let  messages = this.pubnub.getMessage(this.props.data.course.courseID);
+        console.log(messages)
         return(
             <div>
                   <StickyContainer>
@@ -243,7 +330,7 @@ class Course extends Component{
                                         <h4 className="selected">
                                             <span>{photo} Photos</span> <span>{video} Videos</span>
                                         </h4>
-                                        <Button className="publish">Publish</Button>
+                                        <Button className="publish" onClick={this.onSubmitAll.bind(this)}>Publish All</Button>
                                       </div>  
                                </header>
                               )
@@ -254,6 +341,7 @@ class Course extends Component{
                                             <h4 className="selected">
                                                 <span >{this.state.annotCheck.length} Selected</span>
                                             </h4>
+                                              <Button className="publish" onClick={this.onSubmit.bind(this)}>Publish</Button>
                                           </div>  
                                    </header>
                                 )
@@ -267,6 +355,12 @@ class Course extends Component{
                         <Col xs={12} md={12} >
                             <div className="course-description"><h2>{this.props.data.course.description}</h2></div>
                             <Link className="btn back class" to={`/`}><Glyphicon glyph="chevron-left" /> Back</Link>
+                            <Button onClick={this.testPubNub.bind(this)}>PubNub</Button>
+                            <div>
+                              <ul>
+                                {messages.map((m, index) => !(m.message == undefined) ? <li key={'The media was published successfully !' + index}>{m.message.type}</li> : null)}
+                              </ul>
+                            </div>
                             {/*<FormControl className="class-tag-filter" onChange={this.sortStud.bind(this)} componentClass="select" placeholder="select">
                                 <option value="name">Name</option>
                                 <option value="fbmonth">Feedback this month</option>
@@ -308,9 +402,9 @@ class Course extends Component{
                                     case "image":
                                        return (
                                             <span className="media2 images">
-                                            <img className="img-size media"  key={annotation.annotationID} />
+                                            <img className="img-size media"  key={annotation.annotationID} src={annotation.mediaURL}/>
                                             <div className="round">
-                                                <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} /> 
+                                                <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} ref={'ref_' + annotation.annotationID}/> 
                                                 <label htmlFor={annotation.annotationID}></label>
                                              </div>
                                             </span>
@@ -323,7 +417,7 @@ class Course extends Component{
                                           <span className="media2">
                                              <ReactPlayer  key={annotation.annotationID}  className="videomediaannotation media" url={annotation.mediaURL} controls/>
                                                  <div className="round">
-                                                    <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} />
+                                                    <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} ref={'ref_' + annotation.annotationID} />
                                                      <label htmlFor={annotation.annotationID}></label>
                                                 </div>
                                             </span>
@@ -346,7 +440,9 @@ class Course extends Component{
                         default : 
                             return(
                                 <div>
-                                <div className="name">{sorted[key][0].students[0].firstName}</div>
+                                {sorted[key][0].students.map((student) => {
+                                    return (<div className="name">{student.firstName} {student.lastName}</div>);
+                                })}
                                 <Row>
                                 <Masonry className={'my-gallery-class'} options={masonryOptions} >
                                 {sorted[key].map((annotation) => {
@@ -357,7 +453,7 @@ class Course extends Component{
                                                  <span className="media2 images">  
                                                 <img  className="img-size media"   src={annotation.mediaURL}/>
                                                 <div className="round">
-                                                    <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} />
+                                                    <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} ref={'ref_' + annotation.annotationID}/>
                                                     <label htmlFor={annotation.annotationID}></label>
                                                 </div>
                                             </span>
@@ -369,7 +465,7 @@ class Course extends Component{
                                                 <span className="media2"> 
                                                     <ReactPlayer  className="videomediaannotation media"  url={annotation.mediaURL} controls/>
                                                     <div className="round">
-                                                        <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)}/>
+                                                        <input className="check" type="checkbox" id={annotation.annotationID} onChange={this.toggleChange.bind(this)} ref={'ref_' + annotation.annotationID}/>
                                                         <label htmlFor={annotation.annotationID}></label>
                                                     </div>
                                                 </span>
@@ -389,13 +485,13 @@ class Course extends Component{
                     
                     
                     })}
-                
-               
+
                 </Grid>
                 
                  </StickyContainer> 
-                    
+                
 
+                    
             </div>
 
         );
@@ -412,9 +508,22 @@ const mutation = gql`
 	}
 `;
 
+/*
+ * Mutation Query
+ * @args $annotationIDs: [ID!]
+ */
+//const mutation2 = gql`
+//	mutation addAnnotation ($annotation: AnnotationInput){
+//  		addAnnotation(annotation:$annotation, uploadToMediahub:false)	
+//	}
+//`;
+
+
+
 export default compose(
     graphql(MediaQuery, {
     options:  (props) => {  { return { variables: { courseID: props.match.params.courseID, teacherID: localStorage.getItem('userID'), hideMediahubUploaded:true} } } }}),
-    graphql(mutation)
+    graphql(mutation),
+ //   graphql(mutation2)
 )(Course);
 

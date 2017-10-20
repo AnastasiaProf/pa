@@ -27,8 +27,9 @@ class Home extends Component{
 
 
     render(){
+        
         let userID = localStorage.getItem('userID');
-
+        
         //Create 2 tabs, one of this week agenda and one with all the course from th start of the DB
         return(
             <div>

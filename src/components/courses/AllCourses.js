@@ -9,6 +9,7 @@ import { graphql } from 'react-apollo';
 import Grid from 'react-bootstrap/lib/Grid';
 import Row from 'react-bootstrap/lib/Row';
 import Col from 'react-bootstrap/lib/Col';
+import Spinner from 'react-spinkit';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import CourseQuery from '../../queries/fetchCourses';
 import CourseReviewMediaQuery from '../../queries/fetchCoursesReviewMedia';
@@ -106,7 +107,11 @@ class AllCourses extends React.Component {
         console.log(this);
 
         if (this.props.data.loading){
-            return <div>Loading...</div>;
+             return( 
+                <div className="loading">
+                    <Spinner className="loader" name="ball-pulse-rise" color="rgb(217, 83, 79)"/>
+                </div>
+            );
         }
         return(
             <div>
