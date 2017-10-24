@@ -8,6 +8,7 @@ const CourseReviewMediaQuery = gql`
       annotationID
       category
       contentType
+      ignored
       uploadedToMediahubAt
       course{
         courseID

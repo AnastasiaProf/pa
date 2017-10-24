@@ -31,7 +31,8 @@ class AllCourses extends React.Component {
             {annotations.map((annotation) => {
                 let media =  annotation.uploadedtoMediahubAt;
                 let course = annotation.course;
-                if(media == null && !(course == undefined) && !(course == null)){
+                let ignored = annotation.ignored;
+                if(media == null && !(course == undefined) && !(course == null) && !(ignored == true)){
                     if(!(annotation.mediaURL == null) && annotation.category == "media"){
                      console.log(course.description, annotation)
                         if(!(course.courseID in medias)){

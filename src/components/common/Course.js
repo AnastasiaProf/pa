@@ -39,6 +39,7 @@ const MediaQuery = gql`
         annotations(filterCourseIDs:[$courseID], hideMediahubUploaded:$hideMediahubUploaded) {
             annotationID
             deleted
+            ignored
             category
             uploadedToMediahubAt
             students{
@@ -91,10 +92,7 @@ class Course extends Component{
         let courseID = this.props.match.params.courseID;
         this.pubnub.subscribe({ channels: [courseID], withPresence: true, autoload: 100});
     
-        this.pubnub.getStatus((st) => {
-            console.log('st', st);
-
-        });
+        
         this.pubnub.getMessage(courseID, (msg) => {
             if(msg.message.type == "mediahub"){
                 this.props.data.refetch();
@@ -176,7 +174,7 @@ class Course extends Component{
         if(annotations.length > 0){
             annotations.map((annotation) => {
 
-            if(annotation.deleted == false && annotation.category == "media" ){
+            if(annotation.deleted == false && annotation.category == "media"  && !(annotation.ignored == true)){
                 if(annotation.students.length == 0 ){
                     if(!("allclass" in array)){
                        array["allclass"] = []; 
@@ -208,7 +206,7 @@ class Course extends Component{
         let count = 0; 
         if(annotations.length > 0){
            annotations.map((annotation) => {
-                if (annotation.contentType == contentType && annotation.deleted == false && annotation.category == "media"){
+                if (annotation.contentType == contentType && annotation.deleted == false && annotation.category == "media" && !(annotation.ignored == true)){
                     count += 1;
                 }
             })
@@ -229,35 +227,60 @@ class Course extends Component{
         this.setState({annotCheck: array});    
   }
     
-    unCheck(){
-        this.state.annotCheck.forEach(function(e){
-            let ref = 'ref_' + e;
-            this.refs[ref].checked = !this.refs[ref].checked;
-        }, this)
-
+    onRemove(event){
+        event.preventDefault();
+        let annotations = this.state.annotCheck;
+        let course = this.props.data.course.courseID;
+        this.unCheck();
+        annotations.forEach(function(annotationID){
+            let currentannot = {};
+            this.props.data.annotations.forEach(function(e){
+                if(e.annotationID == annotationID){
+                    currentannot = e;
+                }
+            })
+            this.props.updateAnnotation({
+                variables:{
+                    annotationID : annotationID,
+                    annotation : {
+                        category: currentannot.category,
+                        contentType: currentannot.contentType,
+                        mediaURL: currentannot.mediaURL,
+                        thumbnailURL: currentannot.thumbnailURL,
+                        text: currentannot.text,
+                        teacherID: localStorage.getItem('userID'),
+                        tags: currentannot.tags,
+                        studentIDs: currentannot.studentIDs,
+                        courseID: course,
+                        classDate: currentannot.classDate,
+                        ignored: true
+                    }
+                },
+                refetchQueries: [{
+                    query: MediaQuery,
+                    variables: { courseID: course, hideMediahubUploaded: true },
+                },]
+            }).then(() => this.setState({annotCheck:[]}));
+        },this)
     }
     
-    onSubmit(event){
-        event.preventDefault();
-        let annot = this.state.annotCheck;
-        let course = this.props.data.course.courseID;
-        this.props.mutate({
-            variables:{
-                annotationIDs : annot,
-            },
-            refetchQueries: [{
-                query: MediaQuery,
-                variables: { courseID: course, hideMediahubUploaded: true },
-            },]
-        }).then(() => this.setState({annotCheck:[]}));
-        this.unCheck()
-
+    unCheck(){
+        let annotations = this.state.annotCheck;
+        console.log("before a", annotations)
+        annotations.forEach(function(e){
+            console.log("in for each", e)
+            let ref = 'ref_' + e;
+            console.log(ref)
+            this.refs[ref].checked = !this.refs[ref].checked; 
+        }, this)
+        
     }
     
     onSubmitAll(event){
         event.preventDefault();
         let annots = [];
-        this.props.data.annotation.forEach(function(e){
+        let course = this.props.data.course.courseID;
+        this.props.data.annotations.forEach(function(e){
             if(e.deleted == false && e.category == "media" ){
                 annots.push(e.annotationID)
             }
@@ -266,40 +289,42 @@ class Course extends Component{
         if(annots == []){
             return null;
         }
-        
-        this.props.mutate({
+        this.props.updateAnnotationToMediahub({
             variables:{
-                "annotationIDs" : annots,
+                annotationIDs : annots,
             },
+            refetchQueries: [{
+                query: MediaQuery,
+                variables: { courseID: course, hideMediahubUploaded: true },
+            },]
         })
     }
     
-//    addMedia(){
-//        
-//         let course = this.props.data.course.courseID;
-//        
-//         this.props.mutate({
-//             variables: {
-//                "annotation": {
-//                    contentType: "image",
-//                    category: "media",
-//                    mediaURL: 'https://cdn.theatlantic.com/assets/media/img/photo/2015/11/images-from-the-2016-sony-world-pho/s01_130921474920553591/main_900.jpg',
-//                    teacherID: localStorage.getItem('userID'),
-//                    studentIDs: [],
-//                    tags: [],
-//                    deleted: false,
-//                    courseID: course,
-//                    //localCreatedAt : local,
-//                }
-//            }
-//         })
-//    }
+    addMedia(){
+        
+         let course = this.props.data.course.courseID;
+        
+         this.props.addAnnotation({
+             variables: {
+                "annotation": {
+                    contentType: "image",
+                    category: "media",
+                    mediaURL: 'https://cdn.theatlantic.com/assets/media/img/photo/2015/11/images-from-the-2016-sony-world-pho/s01_130921474920553591/main_900.jpg',
+                    teacherID: localStorage.getItem('userID'),
+                    studentIDs: [],
+                    tags: [],
+                    deleted: false,
+                    courseID: course,
+                    //localCreatedAt : local,
+                }
+            }
+         })
+    }
     
     render(){
         let course = "";
         
        
-        console.log(this)
         if (this.props.data.loading){
             return <div>Loading...</div>;
         }
@@ -311,7 +336,6 @@ class Course extends Component{
         let video = this.countAnnot( this.props.data.annotations, "video");
         
         let  messages = this.pubnub.getMessage(this.props.data.course.courseID);
-        console.log(messages)
         return(
             <div>
                   <StickyContainer>
@@ -341,7 +365,7 @@ class Course extends Component{
                                             <h4 className="selected">
                                                 <span >{this.state.annotCheck.length} Selected</span>
                                             </h4>
-                                              <Button className="publish" onClick={this.onSubmit.bind(this)}>Publish</Button>
+                                              <Button className="publish" onClick={this.onRemove.bind(this)}>Ignore</Button>
                                           </div>  
                                    </header>
                                 )
@@ -355,8 +379,10 @@ class Course extends Component{
                         <Col xs={12} md={12} >
                             <div className="course-description"><h2>{this.props.data.course.description}</h2></div>
                             <Link className="btn back class" to={`/`}><Glyphicon glyph="chevron-left" /> Back</Link>
-                             {/*<Button onClick={this.testPubNub.bind(this)}>PubNub</Button>
-                            <div>
+                             <Button onClick={this.addMedia.bind(this)}>Add Media</Button>
+
+                             
+                            {/*<div>
                               <ul>
                                 {messages.map((m, index) => !(m.message == undefined) ? <li key={'The media was published successfully !' + index}>{m.message.type}</li> : null)}
                               </ul>
@@ -500,30 +526,42 @@ class Course extends Component{
 
 /*
  * Mutation Query
- * @args $annotationIDs: [ID!]
+ * 
  */
-const mutation = gql`
+const updateAnnotationToMediahub = gql`
 	mutation uploadAnnotationToMediahub ($annotationIDs: [ID!]){
   		uploadAnnotationToMediahub(annotationIDs:$annotationIDs)	
 	}
 `;
 
-/*
- * Mutation Query
- * @args $annotationIDs: [ID!]
- */
-//const mutation2 = gql`
-//	mutation addAnnotation ($annotation: AnnotationInput){
-//  		addAnnotation(annotation:$annotation, uploadToMediahub:false)	
-//	}
-//`;
 
+const updateAnnotation = gql`
+	mutation updateAnnotation($annotationID: ID!, $annotation: AnnotationInput!){
+        updateAnnotation(annotationID: $annotationID, annotation: $annotation){
+            annotationID
+        }
+	}
+`;
 
+const addAnnotation = gql`
+	mutation addAnnotation($annotation: AnnotationInput){
+        addAnnotation(annotation: $annotation)
+	}
+`;
 
 export default compose(
     graphql(MediaQuery, {
-    options:  (props) => {  { return { variables: { courseID: props.match.params.courseID, teacherID: localStorage.getItem('userID'), hideMediahubUploaded:true} } } }}),
-    graphql(mutation),
- //   graphql(mutation2)
+        options:  (props) => {  { return { variables: { courseID: props.match.params.courseID, teacherID: localStorage.getItem('userID'), hideMediahubUploaded:true} }}},
+        fetchPolicy: 'cache-and-network',
+    }),
+    graphql(updateAnnotationToMediahub, {
+        name: 'updateAnnotationToMediahub'
+    }),
+    graphql(updateAnnotation, {
+        name: 'updateAnnotation'
+    }),
+     graphql(addAnnotation, {
+        name: 'addAnnotation'
+    }),
 )(Course);
 
